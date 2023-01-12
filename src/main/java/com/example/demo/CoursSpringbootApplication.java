@@ -1,14 +1,21 @@
 package com.example.demo;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 // icic on indique où scanner les entités à mapper en db
 // Lui il cherche toutes les classes qui contiennent  @ENtity du package com.ex.demo.entitiees
 @EntityScan("com.example.demo.*")
 public class CoursSpringbootApplication {
+
+	@Bean
+	ModelMapper modelMapper() {
+		return new ModelMapper();
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(CoursSpringbootApplication.class, args);

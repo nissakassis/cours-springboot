@@ -17,6 +17,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -25,7 +26,7 @@ import lombok.ToString;
 //@ToString
 
 @Entity
-
+@RequiredArgsConstructor
 @Data  // avec ca on a getter, setter, toString et RequiredArgsConstructor
 @NoArgsConstructor
 
@@ -33,6 +34,7 @@ public class Person {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@NonNull
 	private Long id;
 	@Column(name = "first_name") // nom de la colonne dans workbench
 	@NonNull // necc pour ajouter  des valeurs de RequiredArgsConstructor

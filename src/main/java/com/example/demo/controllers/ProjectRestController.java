@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,5 +67,41 @@ public class ProjectRestController {
 				() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Person not found with id : " + id));
 		return new ResponseEntity<>(projectToSave, HttpStatus.CREATED);
 	}
+
+	@DeleteMapping("/persons/{personId}/projects/{projetId}")
+    public ResponseEntity<?> deleteProjectByPersonId(@PathVariable(value = "personId") long personId,
+                                                     @PathVariable(value = "projetId") long projetId){
+        personService.findById(personId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Person not found with id : " + personId));
+        projectService.findById(projetId).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id : " + projetId));
+        projectService.deleteOneProjectByPerson(personId, projetId);
+        return new ResponseEntity<>("DELETED !!!", HttpStatus.CREATED);
+    }
+	
+	@PutMapping("/persons/{personId}/projects/{projectId}")
+    public ResponseEntity<Project> editProjectByPersonneNum(@PathVariable(value = "personId") long personId,
+                                                            @PathVariable(value = "projectId") long projectId,
+                                                            @RequestBody Project projet){
+        personService.findById(personId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Person not found with id : " + personId));
+        projectService.findById(projectId).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id : " + projectId));
+        projectService.editOneProjectByPerson(personId, projectId, projet);
+        return new ResponseEntity<>(projet, HttpStatus.CREATED);
+    }
+	
+	@GetMapping("/persons/{personId}/projects/{projetId}")
+    public ResponseEntity<Project> getProjectByPersonId(@PathVariable(value = "personId") long personId,
+                                                  @PathVariable(value = "projetId") long projetId){
+        personService.findById(personId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Person not found with id : " + personId));
+        projectService.findById(projetId).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found with id : " + projetId));
+        Project project = projectService.getOneProjectByPerson(personId, projetId).get();
+        return new ResponseEntity<>(project, HttpStatus.CREATED);
+    }
+	
+	
 
 }

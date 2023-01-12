@@ -2,6 +2,9 @@ package com.example.demo.controllers;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.demo.dto.PersonDto;
 import com.example.demo.entities.Person;
 import com.example.demo.repository.PersonRepository;
 import com.example.demo.services.IPersonService;
@@ -40,6 +44,9 @@ public class PersonRestController {
 	//private PersonRepository personRepository;
 	private IPersonService personService;  // nom dans PersonServiceImpl @Service("personService")
 	
+	@Autowired
+	private ModelMapper modelMapper;
+	
 	// api/persons
 	@GetMapping() // "/persons" car on a rajouté ds le chemin en haut
 	public ResponseEntity<List<Person>> getAll() {
@@ -47,11 +54,21 @@ public class PersonRestController {
 	}
 
 	// api/persons
-	@PostMapping() 
-	public ResponseEntity<Person> create(@RequestBody Person person) {
-		return new ResponseEntity<Person>(personService.saveOrUpdate(person), HttpStatus.CREATED);
-	}
+//	@PostMapping() 
+//	public ResponseEntity<Person> create(@RequestBody Person person) {
+//		return new ResponseEntity<Person>(personService.saveOrUpdate(person), HttpStatus.CREATED);
+//	}
 
+	// Avec validateurs
+	@PostMapping() 
+	public ResponseEntity<Person> create(@RequestBody @Valid PersonDto personDto) {
+		// Person person = new Person();
+		// person.setFirstName( personToDo.getFirstName());
+		// person.setLaststName( personToDo.getLastName());
+		// person.setAge( personToDo.getAge());
+		Person personToSave = modelMapper.map(personDto, Person.class);
+		return new ResponseEntity<Person>(personService.saveOrUpdate(personToSave), HttpStatus.CREATED);
+	}
 	// api/persons
 	@GetMapping("/{id}") // /persons
 	public ResponseEntity<Person> getById(@PathVariable long id) {
@@ -62,18 +79,33 @@ public class PersonRestController {
 	}
 
 	// api/persons/id
+//	@PutMapping("/{id}")
+//	public ResponseEntity<Person> editById(@PathVariable long id, @RequestBody Person person) {
+//		return personService.findById(id).map((p) -> {
+//			p.setFirstName(person.getFirstName());
+//			p.setLastName(person.getLastName());
+//			p.setAge(person.getAge());
+//			personService.saveOrUpdate(person);
+//			return new ResponseEntity<Person>(p, HttpStatus.OK);
+//		}).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+//				"La personne avec l'id " + id + "n'existe pas"));
+//	}
+
+	// Avec Validator
+	
 	@PutMapping("/{id}")
-	public ResponseEntity<Person> editById(@PathVariable long id, @RequestBody Person person) {
+	public ResponseEntity<Person> editById(@PathVariable long id, @RequestBody @Valid PersonDto personDto) {
 		return personService.findById(id).map((p) -> {
-			p.setFirstName(person.getFirstName());
-			p.setLastName(person.getLastName());
-			p.setAge(person.getAge());
-			personService.saveOrUpdate(person);
+//			p.setFirstName(person.getFirstName());
+//			p.setLastName(person.getLastName());
+//			p.setAge(person.getAge());
+			
+			modelMapper.map(personDto, p);
+			personService.saveOrUpdate(p);
 			return new ResponseEntity<Person>(p, HttpStatus.OK);
 		}).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
 				"La personne avec l'id " + id + "n'existe pas"));
 	}
-
 	// api/persons/id
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Boolean> delete(@PathVariable long id)  {
